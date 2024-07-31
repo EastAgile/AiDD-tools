@@ -1,0 +1,113 @@
+{
+  "name": "prompt-generator",
+  "displayName": "AiDD Prompt Generator",
+  "description": "Effortlessly combine multiple files into a single file with customizable templates. Perfect for developers when applying AI-driven Development",
+  "version": "1.0.0",
+  "publisher": "EastAgile",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EastAgile/AiDD-tools"
+  },
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "icon": "icon.png",
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Prompt Generator",
+      "properties": {
+        "promptGenerator.settings": {
+          "type": "object",
+          "default": {
+            "templates": [
+              {
+                "name": "Code review",
+                "template": "Given the below code. Help me review the code. For now and the rest of this session, make sure you output professional-grade, production-ready code that is clean, optimized, maintainable and follow best practices. Only print out the changed parts and where they are, never print out full file contents unless it's a new file. Never print out unchanged files.\n\n\n{content}"
+              }
+            ],
+            "additionalIgnoreRules": [
+              ".git"
+            ]
+          },
+          "description": "Pre-defined prompt templates and additional ignore rules"
+        }
+      }
+    },
+    "customEditors": [
+      {
+        "viewType": "promptGenerator.templateEditor",
+        "displayName": "AiDD Prompt Editor",
+        "selector": [
+          {
+            "filenamePattern": "promptGenerator.templates.json"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "prompt-generator.generate",
+        "title": "AiDD Prompt Generator (cmd+M)"
+      },
+      {
+        "command": "prompt-generator.settings",
+        "title": "AiDD Prompt Generator: Configuration"
+      }
+    ]
+  },
+  "keybindings": [
+    {
+      "command": "prompt-generator.generate",
+      "key": "cmd+M",
+      "mac": "cmd+M",
+      "when": "editorTextFocus"
+    }
+  ],
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "lint": "eslint . --ext .ts,.js",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "test": "vscode-test",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.86.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.3.3",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "ignore": "^5.3.1"
+  }
+}
