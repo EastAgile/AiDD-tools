@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AiDD Prompt Generator: Configuration</title>
+    <link rel="stylesheet" href="${styleUri}" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>AiDD Prompt Generator: Configuration</h1>
+    </div>
+    <div id="tabs" role="tablist">
+      <button class="tab active" onclick="switchTab('templates')" role="tab" aria-selected="true">
+        Templates
+      </button>
+      <button class="tab" onclick="switchTab('ignoreRules')" role="tab" aria-selected="false">
+        Ignore Rules
+      </button>
+    </div>
+    <div id="content">
+      <div id="sidebar"></div>
+      <div id="main"></div>
+    </div>
+    <script src="${scriptUri}"></script>
+  </body>
+</html>
