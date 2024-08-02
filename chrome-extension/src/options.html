@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AiDD Toolset Options</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #885c5c;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 12px 0;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            color: #b0b0b0;
+            width: 75%;
+            max-width: 1000px;
+            padding: 8px 25px 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #3b82f6;
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 20px;
+            border: 1px solid #4a4a4a;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #b0b0b0;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4a4a4a;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #5a5a5a;
+        }
+
+        #status {
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3e3e3e;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4e4e4e;
+        }
+
+        /* Toggle switch styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            margin-top: 3px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4a4a4a;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #b0b0b0;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(18px);
+            background-color: #ffffff;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .toggle-label {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            height: 22px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .option-description {
+            font-size: 12px;
+            color: #888;
+            margin-top: 3px;
+            margin-left: 50px;
+        }
+
+        .shortcut-guide {
+            font-size: 13px;
+        }
+
+        .shortcut-display {
+            display: flex;
+            align-items: center;
+        }
+
+        .shortcut-key {
+            font-size: 11px;
+            font-family: monospace;
+            background-color: #3e3e3e;
+            padding: 4px 7px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .shortcut-key.not-set {
+            font-style: italic;
+        }
+
+        .shortcut-edit {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .shortcut-edit:hover {
+            opacity: 1;
+            color: white;
+        }
+
+        .shortcut-edit svg {
+            width: 17px;
+            height: 17px;
+            fill: currentColor;
+        }
+
+        .shortcut-edit::after {
+            content: "Edit";
+            position: absolute;
+            top: 80%;
+            left: 180%;
+            transform: translateX(-50%);
+            background-color: #4a4a4a;
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .shortcut-edit:hover::after {
+            opacity: 1;
+        }
+
+        .shortcuts-section {
+            width: 50%;
+            margin-top: 40px;
+            border: 1px solid #3e3e3e;
+            border-radius: 4px;
+            padding: 0 15px 15px 15px;
+        }
+
+        .shortcuts-section h2 {
+            margin: -12px 0 8px 0;
+            width: 107px;
+            text-align: center;
+            color: #3b82f6;
+            background-color: #1e1e1e;
+            font-size: 20px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #4a4a4a;
+            margin-top: 10px;
+            align-items: flex-end;
+        }
+
+        .tab {
+            padding: 8px 25px 8px 10px;
+            margin-left: 2px;
+            cursor: pointer;
+            background-color: #2b2b2b;
+            border: 1px solid #4a4a4a;
+            border-bottom: none;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            position: relative;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            height: 20px;
+            line-height: 20px;
+        }
+
+        .tab:first-child {
+            margin-left: 0;
+        }
+
+        .tab.active {
+            background-color: #1e1e1e;
+            border-bottom: 1px solid #1e1e1e;
+            margin-bottom: -1px;
+            height: 21px;
+            line-height: 21px;
+        }
+
+        .tab.current {
+            color: #3b82f6;
+            border-top: 2px solid #3b82f6;
+        }
+
+        .tab-close {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            color: #b0b0b0;
+            font-size: 12px;
+            cursor: pointer;
+            padding-top: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 16px;
+            border-radius: 16px;
+        }
+
+        .tab-close:hover {
+            background-color: #5a5a5a;
+        }
+
+        .new-tab-button {
+            background-color: transparent;
+            border-radius: 24px;
+            color: #b0b0b0;
+            font-size: 18px;
+            margin-left: 5px;
+            cursor: pointer;
+            padding: 10px;
+            height: 25px;
+            width: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 10px;
+            border: 1px solid #4a4a4a;
+            border-top: none;
+            background-color: #1e1e1e;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .template-name-input {
+            flex-grow: 1;
+            padding: 5px;
+            background-color: #2b2b2b;
+            color: #b0b0b0;
+            border: 1px solid #4a4a4a;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .set-current-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #4a4a4a;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .set-current-button:hover {
+            background-color: #5a5a5a;
+        }
+
+        .current-template-status {
+            margin-left: 10px;
+            padding: 5px 10px;
+            color: #b0b0b0;
+            border: 1px solid #3b82f6;
+            border-radius: 4px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .prompt-template {
+            width: 100%;
+            height: 365px;
+            padding: 10px;
+            border: 1px solid rgba(74, 74, 74, 0.5);
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+            border-radius: 0;
+            font-family: monospace;
+            font-size: 13px;
+            background-color: #1e1e1e;
+            color: #b0b0b0;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>AiDD Toolset Options</h1>
+        <div id="templatesContainer">
+            <div class="tabs">
+                <!-- Tabs will be dynamically inserted here -->
+                <button class="new-tab-button" title="Add new template">+</button>
+            </div>
+            <div class="tab-contents"></div>
+        </div>
+
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="enableFileSelection">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Enable File Selection</span>
+        </div>
+        <p class="option-description">
+            When enabled, you will be able to select specific files from your project to include in the AiDD prompt.<br>
+            When disabled, the prompt will be generated without file content.
+        </p>
+
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="autoSubmitPrompt">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Auto submit prompt when launching SkyDeck.ai</span>
+        </div>
+        <p class="option-description">
+            When enabled, the prompt is automatically submitted after pasting into SkyDeck.ai.<br>
+            When disabled, the prompt is pasted but not submitted, allowing you to review and select a model before
+            sending.
+        </p>
+
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="enableApplyChanges">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Allow code changes to be applied directly within SkyDeck.ai</span>
+        </div>
+        <p class="option-description">
+            When enabled, you will be able to apply code changes from AI responses directly within SkyDeck.ai.<br>
+        </p>
+
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="autoFixGitDiff">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Auto fix Git Diff generated by AI when it is incorrect</span>
+        </div>
+        <p class="option-description">
+            When enabled, the extension will automatically attempt to fix incorrect Git diffs generated by AI.<br>
+            When disabled, you will have the option to manually fix incorrect Git diffs.
+        </p>
+
+        <div class="shortcuts-section">
+            <h2>Shortcuts</h2>
+            <div class="shortcut-item">
+                <span class="shortcut-guide">Open File Selection Modal:</span>
+                <div class="shortcut-display">
+                    <span id="fileSelectionShortcut" class="shortcut-key"></span>
+                    <span id="shortcutEdit" class="shortcut-edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button id="reset">Reset to Default</button>
+            <span id="status"></span>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script src="options.js"></script>
+</body>
+
+</html>

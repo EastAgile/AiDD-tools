@@ -11,6 +11,8 @@ Here are some of the tools currently included in our repository:
 
 1. [**VS Code Extension**](/vscode-prompt-generator/)
 - Effortlessly combine multiple files into a single file with customizable templates.
+2. [**Chrome Extension**](/chrome-extension/)
+- An AiDD toolset that enhances workflow between Pivotal Tracker and Skydeck AI, featuring prompt generation, code change application, and global file selection.
 
 ## How to Contribute
 

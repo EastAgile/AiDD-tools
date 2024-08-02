@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "AiDD Toolset",
+  "version": "2.1.0",
+  "description": "An AI-driven development toolset that enhances workflow between Pivotal Tracker and Skydeck AI, featuring prompt generation, code change application, and global file selection.",
+  "host_permissions": ["<all_urls>"],
+  "permissions": [
+    "storage",
+    "commands"
+  ],
+  "background": {"service_worker": "src/background.js"},
+  "icons": {
+    "16": "images/skydeck_icon.png",
+    "48": "images/skydeck_icon.png",
+    "128": "images/skydeck_icon.png"
+  },
+  "options_page": "src/options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "lib/diff.min.js",
+        "src/shared.js",
+        "src/gitignoreHandler.js",
+        "src/file-selection/verticalIconButtons.js",
+        "src/file-selection/fileTreePanel.js",
+        "src/file-selection/resizer.js",
+        "src/file-selection/previewPanel.js",
+        "src/file-selection/bottomButtons.js",
+        "src/file-selection/index.js",
+        "src/prompt-generation/index.js",
+        "src/pivotalTracker.js",
+        "src/skydeck/promptHandler.js",
+        "src/skydeck/gitDiffReconciler.js",
+        "src/skydeck/gitDiffHandler.js",
+        "src/skydeck/main.js",
+        "src/content.js"
+      ],
+      "type": "module",
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/skydeck_icon.png"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "commands": {
+    "open_file_selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Command+Shift+P"
+      },
+      "description": "Open File Selection Modal"
+    }
+  }
+}
