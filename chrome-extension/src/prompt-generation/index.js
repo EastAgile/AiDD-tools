@@ -18,7 +18,7 @@ const PromptGeneration = (function () {
             position: relative;
             background-color: #2b2b2b;
             color: #e0e0e0;
-            padding: 20px 20px 20px 0;
+            padding: 20px;
             border-radius: 8px;
             width: 90%;
             max-width: 1400px;
@@ -61,7 +61,6 @@ const PromptGeneration = (function () {
             border-radius: 4px;
             padding: 20px;
             margin-top: 10px;
-            margin-left: 20px;
             overflow-y: auto;
             flex-grow: 1;
         }
@@ -71,7 +70,9 @@ const PromptGeneration = (function () {
             word-break: break-all;
             font-size: 14px;
             color: #e0e0e0;
+            background-color: #1e1e1e;
             line-height: 1.3;
+            margin: 0;
         }
 
         .prompt-generation-content::-webkit-scrollbar {
@@ -96,7 +97,7 @@ const PromptGeneration = (function () {
             justify-content: space-between;
             align-items: center;
             padding-top: 16px;
-            padding-left: 40px;
+            padding-left: 5px;
         }
 
         .template-selector-wrapper {

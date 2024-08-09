@@ -18,8 +18,7 @@ GitDiffReconciler = (function () {
             const mismatch = mismatches.find(m => m.hunkStart === hunk.oldStart);
             if (mismatch) {
                 // Find the correct starting line
-                const trimmedExpectedLines = mismatch.expected.split('\n').map(line => line.trimStart());
-                let newStart = findCorrectStartLine(lines, trimmedExpectedLines);
+                let newStart = findCorrectStartLine(lines, mismatch.expected.split('\n'));
                 if (newStart !== -1) {
                     // Adjust the hunk
                     hunk.oldStart = newStart;
@@ -62,9 +61,8 @@ GitDiffReconciler = (function () {
     }
 
     function findCorrectStartLine(fileLines, expectedLines) {
-        const trimmedFileLines = fileLines.map(line => line.trimStart());
-        for (let i = 0; i <= trimmedFileLines.length - expectedLines.length; i++) {
-            if (arraysEqual(trimmedFileLines.slice(i, i + expectedLines.length), expectedLines)) {
+        for (let i = 0; i <= fileLines.length - expectedLines.length; i++) {
+            if (arraysEqual(fileLines.slice(i, i + expectedLines.length), expectedLines)) {
                 return i + 1; // +1 because diff lines are 1-indexed
             }
         }
@@ -74,7 +72,7 @@ GitDiffReconciler = (function () {
     function arraysEqual(a, b) {
         if (a.length !== b.length) return false;
         for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) return false;
+            if (a[i].trimStart().trimEnd() !== b[i].trimStart().trimEnd()) return false;
         }
         return true;
     }

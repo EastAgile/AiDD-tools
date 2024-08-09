@@ -704,10 +704,8 @@ GitDiffHandler = (function () {
     }
 
     function findCorrectStartLine(fileLines, expectedLines) {
-        const trimmedFileLines = fileLines.map(line => line.trimStart());
-        const trimmedExpectedLines = expectedLines.map(line => line.trimStart());
-        for (let i = 0; i <= trimmedFileLines.length - trimmedExpectedLines.length; i++) {
-            if (arraysEqual(trimmedFileLines.slice(i, i + trimmedExpectedLines.length), trimmedExpectedLines)) {
+        for (let i = 0; i <= fileLines.length - expectedLines.length; i++) {
+            if (arraysEqual(fileLines.slice(i, i + expectedLines.length), expectedLines)) {
                 return i + 1; // +1 because diff lines are 1-indexed
             }
         }
@@ -717,7 +715,7 @@ GitDiffHandler = (function () {
     function arraysEqual(a, b) {
         if (a.length !== b.length) return false;
         for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) return false;
+            if (a[i].trimStart().trimEnd() !== b[i].trimStart().trimEnd()) return false;
         }
         return true;
     }

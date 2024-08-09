@@ -25,6 +25,7 @@ const FileTreePanel = (function () {
             display: flex;
             flex-direction: column;
             background-color: #1e1e1e;
+            font-size: 13px;
             padding: 0 10px 10px 10px;
             padding-top: 0;
             overflow-y: auto;

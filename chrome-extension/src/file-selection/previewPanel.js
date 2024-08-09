@@ -119,7 +119,8 @@ const PreviewPanel = (function () {
         .file-content h4 {
             color: #4CAF50;
             margin: 0;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: normal;
         }
         .file-content-toggle {
             color: #4CAF50;
@@ -136,6 +137,7 @@ const PreviewPanel = (function () {
         .file-content.expanded pre {
             display: block;
             line-height: 1.3;
+            background-color: #2b2b2b;
         }
         .file-content:not(.expanded) {
             transition: background-color 0.3s ease, box-shadow 0.3s ease, width 0.3s ease, margin 0.3s ease;

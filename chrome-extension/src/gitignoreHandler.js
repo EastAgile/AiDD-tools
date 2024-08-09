@@ -24,7 +24,7 @@ const GitIgnoreHandler = (function() {
             '.vscode', '.idea', '*.suo', '*.ntvs*', '*.njsproj', '*.sln', '*.sw?',
 
             // Additional patterns
-            '.jwt'
+            '.jwt', '__pycache__'
         ]);
 
         const readGitignoreFile = async (directoryHandle) => {

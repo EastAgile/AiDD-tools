@@ -4,6 +4,7 @@ const Skydeck = (function () {
     async function initSkydeck() {
         configs = await Shared.getConfigs();
 
+        await CompactUI.init(configs);
         await PromptHandler.init(configs);
         await GitDiffHandler.init(configs);
 
@@ -16,6 +17,7 @@ const Skydeck = (function () {
                     }
                 }
                 // Notify handlers of config changes
+                CompactUI.updateConfigs(configs);
                 PromptHandler.updateConfigs(configs);
                 GitDiffHandler.updateConfigs(configs);
             }
