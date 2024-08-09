@@ -32,6 +32,7 @@ const VerticalIconButtons = (function () {
         .icon-button {
             width: 22px;
             height: 22px;
+            padding: 5px;
             margin-bottom: 13px;
             background-color: #4a4a4a;
             color: white;

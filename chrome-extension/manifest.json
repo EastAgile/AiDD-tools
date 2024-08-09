@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AiDD Toolset",
-  "version": "2.1.0",
-  "description": "An AI-driven development toolset that enhances workflow between Pivotal Tracker and Skydeck AI, featuring prompt generation, code change application, and global file selection.",
+  "version": "2.5.0",
+  "description": "An AI-driven development toolset that enhances workflow between Pivotal Tracker, Jira, ClickUp, and Skydeck AI, featuring prompt generation, code change application, global file selection, and smart file insertion.",
   "host_permissions": ["<all_urls>"],
   "permissions": [
     "storage",
@@ -22,6 +22,7 @@
       ],
       "js": [
         "lib/diff.min.js",
+        "lib/idb_keyval.js",
         "src/shared.js",
         "src/gitignoreHandler.js",
         "src/file-selection/verticalIconButtons.js",
@@ -32,9 +33,13 @@
         "src/file-selection/index.js",
         "src/prompt-generation/index.js",
         "src/pivotalTracker.js",
+        "src/jira.js",
+        "src/clickup.js",
+        "src/skydeck/compactUI.js",
         "src/skydeck/promptHandler.js",
         "src/skydeck/gitDiffReconciler.js",
         "src/skydeck/gitDiffHandler.js",
+        "src/skydeck/fileInsertionHandler.js",
         "src/skydeck/main.js",
         "src/content.js"
       ],
@@ -58,7 +63,21 @@
         "default": "Ctrl+Shift+P",
         "mac": "Command+Shift+P"
       },
-      "description": "Open File Selection Modal"
-    }
+      "description": "Open File Selection Dialog"
+    },
+    "open_file_selection_without_asking_for_root_directory": {
+      "suggested_key": {
+        "default": "Ctrl+P",
+        "mac": "Command+P"
+      },
+      "description": "Open File Selection Dialog Without Asking User to Select a Root Directory"
+    },
+    "trigger_file_insertion": {
+      "suggested_key": {
+        "default": "Ctrl+J",
+        "mac": "Command+J"
+      },
+      "description": "Trigger Smart File Insertion Dialog"
+    }    
   }
 }

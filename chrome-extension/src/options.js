@@ -8,6 +8,7 @@ function saveChanges() {
     const currentTemplateIndex = templates.findIndex(t => t.isCurrent);
     const enableApplyChanges = document.getElementById('enableApplyChanges').checked;
     const autoFixGitDiff = document.getElementById('autoFixGitDiff').checked;
+    const hideFileContents = document.getElementById('hideFileContents').checked;
 
     chrome.storage.sync.set(
         { 
@@ -16,7 +17,8 @@ function saveChanges() {
             enableFileSelection: enableFileSelection,
             autoSubmitPrompt: autoSubmitPrompt,
             enableApplyChanges: enableApplyChanges,
-            autoFixGitDiff: autoFixGitDiff
+            autoFixGitDiff: autoFixGitDiff,
+            hideFileContents: hideFileContents
         },
         function() {
             // Update status to let user know options were saved.
@@ -39,6 +41,7 @@ async function restoreOptions() {
         document.getElementById('autoSubmitPrompt').checked = configs.autoSubmitPrompt;
         document.getElementById('enableApplyChanges').checked = configs.enableApplyChanges;
         document.getElementById('autoFixGitDiff').checked = configs.autoFixGitDiff;
+        document.getElementById('hideFileContents').checked = configs.hideFileContents;
         
         templates = configs.templates || [{ name: "Default Template", content: Shared.DEFAULT_PROMPT_TEMPLATE, isCurrent: true }];
         
@@ -55,7 +58,7 @@ async function restoreOptions() {
         
         renderTabs();
         
-        await displayCurrentShortcut();
+        await displayCurrentShortcuts();
     } catch (error) {
         console.error("Error restoring options:", error);
     }
@@ -186,19 +189,26 @@ function resetToDefault() {
     document.getElementById('autoSubmitPrompt').checked = Shared.DEFAULT_AUTO_SUBMIT_PROMPT;
     document.getElementById('enableApplyChanges').checked = Shared.DEFAULT_ENABLE_APPLY_CHANGES;
     document.getElementById('autoFixGitDiff').checked = Shared.DEFAULT_AUTO_FIX_GIT_DIFF;
+    document.getElementById('hideFileContents').checked = Shared.DEFAULT_HIDE_FILE_CONTENTS;
     renderTabs();
     saveChanges();
 }
 
-async function displayCurrentShortcut() {
+async function displayCurrentShortcuts() {
     try {
         const commands = await chrome.commands.getAll();
         const fileSelectionCommand = commands.find(command => command.name === "open_file_selection");
-        
-        updateShortcutDisplay(fileSelectionCommand);
+        const fileSelectionWithoutAskingCommand = commands.find(command => command.name === "open_file_selection_without_asking_for_root_directory");
+        const fileInsertionCommand = commands.find(command => command.name === "trigger_file_insertion");
+    
+        updateShortcutDisplay(fileSelectionCommand, 'fileSelectionShortcut');   
+        updateShortcutDisplay(fileSelectionWithoutAskingCommand, 'fileSelectionShortcutWithoutAsking');
+        updateShortcutDisplay(fileInsertionCommand, 'fileInsertionShortcut');
     } catch (error) {
-        console.error("Error fetching shortcut:", error);
+        console.error("Error fetching shortcuts:", error);
         document.getElementById('fileSelectionShortcut').textContent = 'Error fetching shortcut';
+        document.getElementById('fileSelectionShortcutWithoutAsking').textContent = 'Error fetching shortcut';
+        document.getElementById('fileInsertionShortcut').textContent = 'Error fetching shortcut';
     }
 }
 
@@ -229,8 +239,8 @@ function convertShortcutToFullWords(shortcut) {
     return parts.join(' + ');
 }
 
-function updateShortcutDisplay(command) {
-    const shortcutElement = document.getElementById('fileSelectionShortcut');
+function updateShortcutDisplay(command, elementId) {
+    const shortcutElement = document.getElementById(elementId);
     if (command && command.shortcut) {
         const fullWordShortcut = convertShortcutToFullWords(command.shortcut);
         shortcutElement.textContent = fullWordShortcut;
@@ -248,21 +258,33 @@ function openShortcutsPage() {
     chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 }
 
-// Event listeners
-document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('reset').addEventListener('click', resetToDefault);
 
 // Add event listener for the shortcuts link
 document.getElementById('shortcutEdit').addEventListener('click', openShortcutsPage);
+document.getElementById('shortcutEditWithoutAsking').addEventListener('click', openShortcutsPage);
+document.getElementById('shortcutEditFileInsertion').addEventListener('click', openShortcutsPage);
 
 // Add event listeners for toggle switches
 document.getElementById('enableFileSelection').addEventListener('change', saveChanges);
 document.getElementById('autoSubmitPrompt').addEventListener('change', saveChanges);
 document.getElementById('enableApplyChanges').addEventListener('change', saveChanges);
 document.getElementById('autoFixGitDiff').addEventListener('change', saveChanges);
-document.getElementById('autoFixGitDiff').addEventListener('change', saveChanges);
+document.getElementById('hideFileContents').addEventListener('change', saveChanges);
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', async () => {
+    await restoreOptions();
+    displayVersion();
+});
+
+async function displayVersion() {
+    const manifest = chrome.runtime.getManifest();
+    const version = manifest.version;
+    document.getElementById('version').textContent = `v${version}`;
+}
 
 // Update shortcut when the options page gains focus
 window.addEventListener('focus', () => {
-    displayCurrentShortcut();
+    displayCurrentShortcuts();
 });

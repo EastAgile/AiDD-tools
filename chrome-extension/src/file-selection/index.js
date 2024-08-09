@@ -130,7 +130,7 @@ const FileSelection = (function () {
         if (savedRatio) {
             fileTreePanel.setFlexValue(`0 0 ${savedRatio}%`);
         } else {
-            fileTreePanel.setFlexValue("0 0 41%");
+            fileTreePanel.setFlexValue("0 0 32%");
         }
 
         modal.appendChild(splitViewContainer);

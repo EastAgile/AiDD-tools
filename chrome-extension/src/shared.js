@@ -1,5 +1,4 @@
 const Shared = (function () {
-
     const DEFAULT_PROMPT_TEMPLATE = `
 I'm working on this Pivotal Tracker story:
 
@@ -26,7 +25,7 @@ I will provide you my current source code. Please help me implement this story.
 
 **Guidelines for Git Diff Output:**
 - Do not include any comments or explanatory text within the diff output.
-- Comment lines such as " // ... (rest of the file remains the same)" or "// ... (existing code)" in the diff output are unacceptable.
+- Comment lines such as "// ... (rest of the file remains the same)" or "// ... (existing code)" in the diff output are unacceptable.
 - Ensure that context lines are 100% accurate, including spaces, empty lines, and brackets.
 - Even minor discrepancies in context lines can prevent the diff from being applied successfully.
 - Preserve exact indentation for all added, removed, and context lines as they appear in the file.
@@ -35,12 +34,10 @@ I will provide you my current source code. Please help me implement this story.
 `.trim();
 
     const DEFAULT_ENABLE_FILE_SELECTION = true;
-
     const DEFAULT_AUTO_SUBMIT_PROMPT = false;
-
     const DEFAULT_ENABLE_APPLY_CHANGES = true;
-
     const DEFAULT_AUTO_FIX_GIT_DIFF = true;
+    const DEFAULT_HIDE_FILE_CONTENTS = true;
 
     function getConfigs() {
         return new Promise((resolve, reject) => {
@@ -51,7 +48,8 @@ I will provide you my current source code. Please help me implement this story.
                     enableFileSelection: DEFAULT_ENABLE_FILE_SELECTION,
                     autoSubmitPrompt: DEFAULT_AUTO_SUBMIT_PROMPT,
                     enableApplyChanges: DEFAULT_ENABLE_APPLY_CHANGES,
-                    autoFixGitDiff: DEFAULT_AUTO_FIX_GIT_DIFF
+                    autoFixGitDiff: DEFAULT_AUTO_FIX_GIT_DIFF,
+                    hideFileContents: DEFAULT_HIDE_FILE_CONTENTS
                 },
                 function (items) {
                     if (chrome.runtime.lastError) {
@@ -191,7 +189,32 @@ I will provide you my current source code. Please help me implement this story.
             .replace("{title}", title)
             .replace("{description}", description)
             .replace("{selectedFilesContent}", selectedFilesContent);
-    };    
+    };
+
+    async function storeDirectoryHandle(handle) {
+        await IDBKeyval.set('rootDirectoryHandle', handle);
+    }
+
+    async function getStoredDirectoryHandle() {
+        const handle = await IDBKeyval.get('rootDirectoryHandle');
+        if (handle && await verifyDirectoryHandle(handle)) {
+            return handle;
+        }
+        return null;
+    }
+
+    async function verifyDirectoryHandle(handle) {
+        try {
+            // Attempt to query the directory to ensure it is still usable and has read permissions
+            for await (const _ of handle.values()) {
+                return true;
+            }
+        } catch (error) {
+            console.log("[AiDD] Directory handle is no longer valid or lacks read permissions:", error);
+            return false;
+        }
+        return false;
+    }
 
     return {
         getConfigs: getConfigs,
@@ -202,10 +225,13 @@ I will provide you my current source code. Please help me implement this story.
         showTooltip: showTooltip,
         copyToClipboard: copyToClipboard,
         generateContent: generateContent,
+        storeDirectoryHandle: storeDirectoryHandle,
+        getStoredDirectoryHandle: getStoredDirectoryHandle,        
         DEFAULT_PROMPT_TEMPLATE: DEFAULT_PROMPT_TEMPLATE,
         DEFAULT_ENABLE_FILE_SELECTION: DEFAULT_ENABLE_FILE_SELECTION,
         DEFAULT_AUTO_SUBMIT_PROMPT: DEFAULT_AUTO_SUBMIT_PROMPT,
         DEFAULT_ENABLE_APPLY_CHANGES: DEFAULT_ENABLE_APPLY_CHANGES,
         DEFAULT_AUTO_FIX_GIT_DIFF: DEFAULT_AUTO_FIX_GIT_DIFF,
+        DEFAULT_HIDE_FILE_CONTENTS: DEFAULT_HIDE_FILE_CONTENTS,
     };
 })();
