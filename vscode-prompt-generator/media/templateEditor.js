@@ -49,9 +49,27 @@
         const template = data.templates[selectedTemplateIndex];
         main.innerHTML = `
           <form id="template-form">
-            <input type="text" id="templateName" value="${escapeHtml(template.name)}" placeholder="Enter template name">
-            <textarea id="templateContent" placeholder="Enter template content">${escapeHtml(template.template)}</textarea>
-            <button type="submit">Save Changes</button>
+            <div class="form-group">
+              <label for="templateName">Template Name</label>
+              <input type="text" id="templateName" value="${escapeHtml(template.name)}" placeholder="Enter template name">
+            </div>
+            <div class="form-group">
+              <label for="templateContent">Template Content</label>
+              <textarea id="templateContent" placeholder="Enter template content">${escapeHtml(template.template)}</textarea>
+            </div>
+            <div class="form-group checkbox">
+              <input type="checkbox" id="includeHierarchy" ${template.includeHierarchy !== false ? "checked" : ""}>
+              <label for="includeHierarchy">Include file hierarchy</label>
+            </div>
+            <div class="form-group">
+              <label for="fileStartMarker">File Start Marker</label>
+              <input type="text" id="fileStartMarker" value="${escapeHtml(template.fileStartMarker || "")}" placeholder="File start marker">
+            </div>
+            <div class="form-group">
+              <label for="fileEndMarker">File End Marker</label>
+              <input type="text" id="fileEndMarker" value="${escapeHtml(template.fileEndMarker || "")}" placeholder="File end marker">
+            </div>
+            <button type="submit" class="submit-btn">Save Changes</button>
           </form>
         `;
         document.getElementById("template-form").onsubmit = (e) => {
@@ -103,11 +121,31 @@
     });
   }
 
-  // Save the current template
+  // Save changes to VS Code extension
   function saveTemplate() {
     const name = document.getElementById("templateName").value;
     const content = document.getElementById("templateContent").value;
-    data.templates[selectedTemplateIndex] = { name, template: content };
+    const includeHierarchy = document.getElementById("includeHierarchy").checked;
+    const fileStartMarker = document.getElementById("fileStartMarker").value;
+    const fileEndMarker = document.getElementById("fileEndMarker").value;
+
+    const template = {
+      name,
+      template: content,
+    };
+
+    // Only add these properties if they're different from the defaults
+    if (!includeHierarchy) {
+      template.includeHierarchy = false;
+    }
+    if (fileStartMarker) {
+      template.fileStartMarker = fileStartMarker;
+    }
+    if (fileEndMarker) {
+      template.fileEndMarker = fileEndMarker;
+    }
+
+    data.templates[selectedTemplateIndex] = template;
     updateTemplateList();
     saveChanges();
   }
@@ -150,7 +188,10 @@
 
   // Add a new template
   window.addTemplate = () => {
-    data.templates.push({ name: "New Template", template: "{content}" });
+    data.templates.push({
+      name: "New Template",
+      template: "{content}",
+    });
     selectedTemplateIndex = data.templates.length - 1;
     updateTemplateList();
     updateMainArea();

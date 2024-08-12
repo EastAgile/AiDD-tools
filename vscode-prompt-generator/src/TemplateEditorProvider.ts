@@ -77,6 +77,33 @@ export class TemplateEditorProvider implements vscode.CustomTextEditorProvider {
       .replace("${scriptUri}", scriptUri.toString())
       .replace("${styleUri}", styleUri.toString());
 
+    htmlContent = htmlContent.replace(
+      'id="template-form">',
+      `id="template-form">
+        <div class="form-group">
+          <label for="templateName">Template Name</label>
+          <input type="text" id="templateName" placeholder="Enter template name">
+        </div>
+        <div class="form-group">
+          <label for="templateContent">Template Content</label>
+          <textarea id="templateContent" placeholder="Enter template content"></textarea>
+        </div>
+        <div class="form-group checkbox">
+          <input type="checkbox" id="includeHierarchy">
+          <label for="includeHierarchy">Include file hierarchy</label>
+        </div>
+        <div class="form-group">
+          <label for="fileStartMarker">File Start Marker</label>
+          <input type="text" id="fileStartMarker" placeholder="File start marker">
+        </div>
+        <div class="form-group">
+          <label for="fileEndMarker">File End Marker</label>
+          <input type="text" id="fileEndMarker" placeholder="File end marker">
+        </div>
+        <button type="submit" class="submit-btn">Save Changes</button>
+      `
+    );
+
     return htmlContent;
   }
 }

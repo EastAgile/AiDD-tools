@@ -7,6 +7,9 @@ import { TemplateEditorProvider } from "./TemplateEditorProvider";
 interface Template {
   name: string;
   template: string;
+  includeHierarchy: boolean;
+  fileStartMarker: string;
+  fileEndMarker: string;
 }
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -44,14 +47,20 @@ async function generatePrompt(): Promise<void> {
     return;
   }
 
-  const fileHierarchy = generateFileHierarchy(workspaceFolder, selectedFiles);
-  const wrappedContents = await getWrappedContents(workspaceFolder, selectedFiles);
+  const fileHierarchy =
+    selectedTemplate.includeHierarchy !== false
+      ? generateFileHierarchy(workspaceFolder, selectedFiles)
+      : "";
+  const wrappedContents = await getWrappedContents(
+    workspaceFolder,
+    selectedFiles,
+    selectedTemplate
+  );
   const combinedWrappedContent = wrappedContents.join("\n");
   const finalContent = selectedTemplate.template.replace(
     "{content}",
-    `${fileHierarchy}\n\n${combinedWrappedContent}`
+    `${fileHierarchy}${fileHierarchy ? "\n\n" : ""}${combinedWrappedContent}`
   );
-
   const document = await vscode.workspace.openTextDocument({
     content: finalContent,
     language: "plaintext",
@@ -104,14 +113,26 @@ async function selectTemplate(): Promise<Template | undefined> {
 
 async function getWrappedContents(
   workspaceFolder: vscode.WorkspaceFolder,
-  selectedFiles: vscode.QuickPickItem[]
+  selectedFiles: vscode.QuickPickItem[],
+  template: Template
 ): Promise<string[]> {
+  const defaultStartMarker = ">>>>>>>>>>>>> Starting contents of file {filePath} >>>>>>>>>>>>>>>";
+  const defaultEndMarker = "<<<<<<<<<<<<<< End of contents of file {filePath} <<<<<<<<<<<<<<";
+
   return Promise.all(
     selectedFiles.map(async (item) => {
       const filePath = path.join(workspaceFolder.uri.fsPath, item.label);
       const content = await readFile(filePath);
       const relativePath = path.relative(workspaceFolder.uri.fsPath, filePath);
-      return `>>>>> Starting contents of file ${relativePath} >>>>>\n${content}\n<<<<< End of contents of file ${relativePath} <<<<<\n`;
+      const startMarker = (template.fileStartMarker || defaultStartMarker).replace(
+        "{filePath}",
+        relativePath
+      );
+      const endMarker = (template.fileEndMarker || defaultEndMarker).replace(
+        "{filePath}",
+        relativePath
+      );
+      return `${startMarker}\n${content}\n${endMarker}\n`;
     })
   );
 }
