@@ -44,9 +44,13 @@ async function generatePrompt(): Promise<void> {
     return;
   }
 
+  const fileHierarchy = generateFileHierarchy(workspaceFolder, selectedFiles);
   const wrappedContents = await getWrappedContents(workspaceFolder, selectedFiles);
   const combinedWrappedContent = wrappedContents.join("\n");
-  const finalContent = selectedTemplate.template.replace("{content}", combinedWrappedContent);
+  const finalContent = selectedTemplate.template.replace(
+    "{content}",
+    `${fileHierarchy}\n\n${combinedWrappedContent}`
+  );
 
   const document = await vscode.workspace.openTextDocument({
     content: finalContent,
@@ -106,8 +110,8 @@ async function getWrappedContents(
     selectedFiles.map(async (item) => {
       const filePath = path.join(workspaceFolder.uri.fsPath, item.label);
       const content = await readFile(filePath);
-      const fileName = path.basename(filePath);
-      return `>>>>>>>>>>>>>>> Starting contents of file ${fileName} >>>>>>>>>>>>>>>\n${content}\n<<<<<<<<<<<<<< End of contents of file ${fileName} <<<<<<<<<<<<<<\n`;
+      const relativePath = path.relative(workspaceFolder.uri.fsPath, filePath);
+      return `>>>>> Starting contents of file ${relativePath} >>>>>\n${content}\n<<<<< End of contents of file ${relativePath} <<<<<\n`;
     })
   );
 }
@@ -158,6 +162,40 @@ function openTemplateEditor(): void {
   vscode.workspace.applyEdit(workspaceEdit).then(() => {
     vscode.commands.executeCommand("vscode.openWith", filePath, "promptGenerator.templateEditor");
   });
+}
+
+function generateFileHierarchy(
+  workspaceFolder: vscode.WorkspaceFolder,
+  selectedFiles: vscode.QuickPickItem[]
+): string {
+  const rootName = path.basename(workspaceFolder.uri.fsPath);
+  const fileTree: { [key: string]: any } = { [rootName]: {} };
+
+  selectedFiles.forEach((file) => {
+    const parts = file.label.split(path.sep);
+    let current = fileTree[rootName];
+    parts.forEach((part, index) => {
+      if (!current[part]) {
+        current[part] = index === parts.length - 1 ? null : {};
+      }
+      current = current[part];
+    });
+  });
+
+  function printTree(node: any, prefix: string = ""): string {
+    let result = "";
+    const entries = Object.entries(node);
+    entries.forEach(([key, value], index) => {
+      const isLast = index === entries.length - 1;
+      result += `${prefix}${isLast ? "└── " : "├── "}${key}\n`;
+      if (value !== null) {
+        result += printTree(value, `${prefix}${isLast ? "    " : "│   "}`);
+      }
+    });
+    return result;
+  }
+
+  return `File Hierarchy:\n${printTree(fileTree)}`;
 }
 
 export function deactivate(): void {}
