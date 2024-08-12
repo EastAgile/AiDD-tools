@@ -13,16 +13,22 @@ interface Template {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-  const disposable = vscode.commands.registerCommand("prompt-generator.generate", generatePrompt);
+  const disposable = vscode.commands.registerCommand("prompt-generator.generate", () =>
+    generatePrompt(context)
+  );
 
   context.subscriptions.push(disposable);
   context.subscriptions.push(TemplateEditorProvider.register(context));
   context.subscriptions.push(
     vscode.commands.registerCommand("prompt-generator.settings", openTemplateEditor)
   );
+  // Initialize selected files state if it doesn't exist
+  if (!context.globalState.get("selectedFiles")) {
+    context.globalState.update("selectedFiles", []);
+  }
 }
 
-async function generatePrompt(): Promise<void> {
+async function generatePrompt(context: vscode.ExtensionContext): Promise<void> {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
   if (!workspaceFolder) {
     vscode.window.showErrorMessage(
@@ -31,7 +37,7 @@ async function generatePrompt(): Promise<void> {
     return;
   }
 
-  const selectedFiles = await selectFiles(workspaceFolder);
+  const selectedFiles = await selectFiles(workspaceFolder, context);
   if (selectedFiles.length === 0) {
     vscode.window.showInformationMessage(
       "No files were selected. Please choose at least one file to generate the prompt."
@@ -70,23 +76,45 @@ async function generatePrompt(): Promise<void> {
 }
 
 async function selectFiles(
-  workspaceFolder: vscode.WorkspaceFolder
+  workspaceFolder: vscode.WorkspaceFolder,
+  context: vscode.ExtensionContext
 ): Promise<vscode.QuickPickItem[]> {
   const quickPick = vscode.window.createQuickPick();
   quickPick.canSelectMany = true;
   quickPick.title = "Select files to concatenate";
 
   const files = await getAllFiles(workspaceFolder.uri.fsPath);
-  quickPick.items = files.map((file) => ({
+  const selectedFiles = context.globalState.get<string[]>("selectedFiles") || [];
+
+  // Sort files to put previously selected files on top
+  const sortedFiles = files.sort((a, b) => {
+    const aSelected = selectedFiles.includes(a);
+    const bSelected = selectedFiles.includes(b);
+    if (aSelected && !bSelected) return -1;
+    if (!aSelected && bSelected) return 1;
+    return 0;
+  });
+
+  const items = sortedFiles.map((file) => ({
     label: vscode.workspace.asRelativePath(file),
     description: path.basename(file),
+    picked: selectedFiles.includes(file),
   }));
+
+  quickPick.items = items;
+  quickPick.selectedItems = items.filter((item) => item.picked);
 
   quickPick.show();
   const selection = await new Promise<readonly vscode.QuickPickItem[]>((resolve) => {
     quickPick.onDidAccept(() => resolve(quickPick.selectedItems));
   });
   quickPick.dispose();
+
+  // Update selected files in global state
+  const newSelectedFiles = selection.map((item) =>
+    path.join(workspaceFolder.uri.fsPath, item.label)
+  );
+  await context.globalState.update("selectedFiles", newSelectedFiles);
 
   return [...selection];
 }
